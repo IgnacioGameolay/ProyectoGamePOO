@@ -1,32 +1,36 @@
 package puppy.code;
 
+import com.badlogic.gdx.graphics.Texture;
+
 public abstract class Entidad implements Vivible {
 	protected int x;  // Posición en el eje X
     protected int y;  // Posición en el eje Y
-    protected int velocidad;  // Velocidad de la entidad
+    protected float velocidadX;  // Velocidad de la entidad
+    protected float velocidadY;  // Velocidad de la entidad
     protected int vida;  // Puntos de vida de la entidad
 
     // Constructor
-    public Entidad(int x, int y, int velocidad, int vida) {
+    public Entidad(int x, int y, int size, int xSpeed, int ySpeed, Texture texture, float velocidadX, float velocidadY) {
         this.x = x;
         this.y = y;
-        this.velocidad = velocidad;
-        this.vida = vida;
+        this.velocidadX = velocidadX;
+        this.velocidadY = velocidadY;
     }
+    
     public abstract void mover(); 
 	@Override
 	public abstract void disparar();
 
+	@Override
+    public abstract void vivir();
+	
 	public void morir() {
         System.out.println("La entidad ha muerto.");
     }
 
-    @Override
-    public void vivir() {
-        System.out.println("La entidad está viva.");
-    }
+    
  // Otros métodos comunes
-    public boolean estaVivo() {
+    public boolean isAlive() {
         return vida > 0;
     }
 
@@ -47,14 +51,21 @@ public abstract class Entidad implements Vivible {
         this.y = y;
     }
 
-    public int getVelocidad() {
-        return velocidad;
+    public float getVelocidadX() {
+        return velocidadX;
+    }
+    
+    public float getVelocidadY() {
+        return velocidadY;
     }
 
-    public void setVelocidad(int velocidad) {
-        this.velocidad = velocidad;
+    public void setVelocidadX(int velocidadX) {
+        this.velocidadX = velocidadX;
     }
-
+    
+    public void setVelocidadY(int velocidadY) {
+        this.velocidadY = velocidadY;
+    }
     public int getVida() {
         return vida;
     }

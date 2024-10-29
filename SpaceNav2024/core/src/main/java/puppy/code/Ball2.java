@@ -6,75 +6,58 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-
-public class Ball2 {
-	private int x;
-    private int y;
-    private int xSpeed;
-    private int ySpeed;
+public class Ball2 extends Entidad {
     private Sprite spr;
 
-    public Ball2(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
-    	spr = new Sprite(tx);
-    	this.x = x; 
- 	
-        //validar que borde de esfera no quede fuera
-    	if (x-size < 0) this.x = x+size;
-    	if (x+size > Gdx.graphics.getWidth())this.x = x-size;
-         
-        this.y = y;
-        //validar que borde de esfera no quede fuera
-    	if (y-size < 0) this.y = y+size;
-    	if (y+size > Gdx.graphics.getHeight())this.y = y-size;
-    	
-        spr.setPosition(x, y);
-        this.setXSpeed(xSpeed);
-        this.setySpeed(ySpeed);
-    }
-    public void update() {
-        x += getXSpeed();
-        y += getySpeed();
+    public Ball2(int x, int y, int size, int xSpeed, int ySpeed, Texture texture) {
+    	super(x, y, size, xSpeed, ySpeed, texture, xSpeed, ySpeed);
+        this.spr = new Sprite(texture);
 
-        if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > Gdx.graphics.getWidth())
-        	setXSpeed(getXSpeed() * -1);
-        if (y+getySpeed() < 0 || y+getySpeed()+spr.getHeight() > Gdx.graphics.getHeight())
-        	setySpeed(getySpeed() * -1);
+        // Asegurar que Ball2 no salga fuera de los límites de la pantalla
+        if (x - size < 0) this.x = size;
+        if (x + size > Gdx.graphics.getWidth()) this.x = Gdx.graphics.getWidth() - size;
+        if (y - size < 0) this.y = size;
+        if (y + size > Gdx.graphics.getHeight()) this.y = Gdx.graphics.getHeight() - size;
+
+        spr.setPosition(this.x, this.y);
+    }
+
+    @Override
+    public void mover() {
+        // Actualizar la posición y verificar colisiones con los bordes
+        x += velocidadX;
+        y += velocidadY;
+
+        if (x < 0 || x + spr.getWidth() > Gdx.graphics.getWidth()) {
+        	velocidadX *= -1;
+        }
+        if (y < 0 || y + spr.getHeight() > Gdx.graphics.getHeight()) {
+        	velocidadY *= -1;
+        }
+
         spr.setPosition(x, y);
     }
-    
-    public Rectangle getArea() {
-    	return spr.getBoundingRectangle();
+
+    @Override
+    public void disparar() {
+        // No implementado para Ball2
     }
-    public void draw(SpriteBatch batch) {
-    	spr.draw(batch);
-    }
-    
-    public void checkCollision(Ball2 b2) {
-        if(spr.getBoundingRectangle().overlaps(b2.spr.getBoundingRectangle())){
-        	// rebote
-            if (getXSpeed() ==0) setXSpeed(getXSpeed() + b2.getXSpeed()/2);
-            if (b2.getXSpeed() ==0) b2.setXSpeed(b2.getXSpeed() + getXSpeed()/2);
-        	setXSpeed(- getXSpeed());
-            b2.setXSpeed(-b2.getXSpeed());
-            
-            if (getySpeed() ==0) setySpeed(getySpeed() + b2.getySpeed()/2);
-            if (b2.getySpeed() ==0) b2.setySpeed(b2.getySpeed() + getySpeed()/2);
-            setySpeed(- getySpeed());
-            b2.setySpeed(- b2.getySpeed()); 
+
+    public void checkCollision(Ball2 other) {
+        if (spr.getBoundingRectangle().overlaps(other.spr.getBoundingRectangle())) {
+            // Invertir las velocidades para simular el rebote
+            this.velocidadX *= -1;
+            this.velocidadY *= -1;
+            other.velocidadX *= -1;
+            other.velocidadY *= -1;
         }
     }
-	public int getXSpeed() {
-		return xSpeed;
-	}
-	public void setXSpeed(int xSpeed) {
-		this.xSpeed = xSpeed;
-	}
-	public int getySpeed() {
-		return ySpeed;
-	}
-	public void setySpeed(int ySpeed) {
-		this.ySpeed = ySpeed;
-	}
-	
-    
+
+    public Rectangle getArea() {
+        return spr.getBoundingRectangle();
+    }
+
+    public void draw(SpriteBatch batch) {
+        spr.draw(batch);
+    }
 }
