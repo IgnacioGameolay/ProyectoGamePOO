@@ -10,7 +10,8 @@ public abstract class Entidad implements Vivible {
     protected int vida;  // Puntos de vida de la entidad
 
     // Constructor
-    public Entidad(int x, int y, int size, int xSpeed, int ySpeed, Texture texture, float velocidadX, float velocidadY) {
+    public Entidad(int x, int y, int size, int xSpeed, int ySpeed, 
+    		Texture texture, float velocidadX, float velocidadY) {
         this.x = x;
         this.y = y;
         this.velocidadX = velocidadX;

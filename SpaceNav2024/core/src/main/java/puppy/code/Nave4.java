@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Nave4 extends Entidad {
     private PantallaJuego juego;
@@ -16,7 +17,7 @@ public class Nave4 extends Entidad {
     private Sound soundBala;
     private Texture txBala;
     private boolean herido = false;
-    private int tiempoHeridoMax = 50;
+    private int tiempoHeridoMax = 10;
     private int tiempoHerido;
 
     public Nave4(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala, PantallaJuego juego) {
@@ -37,15 +38,22 @@ public class Nave4 extends Entidad {
 
         if (!herido) {
         	// Movimiento con teclado
-            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) velocidadX--;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) velocidadX++;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) velocidadY--;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) velocidadY++;
-
-            // Mantener dentro de los límites de la pantalla
-            if (x + velocidadX < 0 || x + velocidadX + spr.getWidth() > Gdx.graphics.getWidth()) velocidadX *= -1;
-            if (y + velocidadY < 0 || y + velocidadY + spr.getHeight() > Gdx.graphics.getHeight()) velocidadY *= -1;
-
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            	velocidadX = -5;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            	velocidadX = 5;
+            } else {
+            	velocidadX = 0;
+            }
+            
+         // Mantener dentro de los límites de la pantalla
+            if (x + velocidadX < 0) {
+                velocidadX = 0;
+                spr.setX(0);
+            } else if (x + velocidadX + spr.getWidth() > Gdx.graphics.getWidth()) {
+                velocidadX = 0;
+                spr.setX(Gdx.graphics.getWidth() - spr.getWidth());
+            }
             spr.setPosition(x + velocidadX, y + velocidadY);
             spr.draw(batch);
         } else {
@@ -68,29 +76,36 @@ public class Nave4 extends Entidad {
         // Movimiento con teclado
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) velocidadX--;
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) velocidadX++;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) velocidadY--;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) velocidadY++;
 
         // Mantener dentro de los límites de la pantalla
         if (x + velocidadX < 0 || x + velocidadX + spr.getWidth() > Gdx.graphics.getWidth()) velocidadX *= -1;
-        if (y + velocidadY < 0 || y + velocidadY + spr.getHeight() > Gdx.graphics.getHeight()) velocidadY *= -1;
-
-        spr.setPosition(x + velocidadX, y + velocidadY);
+        spr.setPosition(x + velocidadX,y);
     }
 
     @Override
     public void disparar() {
         if (juego != null) {
             Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0, 3, txBala);
-            juego.agregarBala(bala);
+            juego.agregarBalaJugador(bala);
             soundBala.play();
-        } else {
-            System.out.println("Error: PantallaJuego no ha sido inicializada.");
         }
     }
 
-    public boolean checkCollision(Ball2 b) {
+    public boolean checkCollision(Enemigo e) {
+        if (!herido && e.getArea().overlaps(spr.getBoundingRectangle())) {
+            vida--;
+            herido = true;
+            tiempoHerido = tiempoHeridoMax;
+            sonidoHerido.play();
+            if (vida <= 0) destruida = true;
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean checkCollision(Bullet b) {
         if (!herido && b.getArea().overlaps(spr.getBoundingRectangle())) {
+        	b.setDestroyed(true);
             vida--;
             herido = true;
             tiempoHerido = tiempoHeridoMax;
@@ -124,4 +139,9 @@ public class Nave4 extends Entidad {
     public void setVidas(int vidas) {
         this.vida = vidas;
     }
+    
+    public Rectangle getArea() {
+        return spr.getBoundingRectangle();
+    }
+    
 }

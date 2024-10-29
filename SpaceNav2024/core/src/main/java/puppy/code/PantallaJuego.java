@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 
 
 
@@ -34,8 +35,9 @@ public class PantallaJuego implements Screen {
     private Random random;
     private Nave4 nave;
   
-    private List<Ball2> enemigosLista = new ArrayList<>();
-    private List<Bullet> balas = new ArrayList<>();
+    private List<Enemigo> enemigosLista = new ArrayList<>();
+    private List<Bullet> balasJugador = new ArrayList<>();
+    private List<Bullet> balasEnemigo = new ArrayList<>();
 
     public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score, 
     		int velXAsteroides, int velYAsteroides, int cantAsteroides, int alto, int ancho) {
@@ -100,13 +102,25 @@ public class PantallaJuego implements Screen {
                 int tipo = (fila == 0) ? 1 : 0; // Tipo de enemigo (1 para fila 0, 0 para las demás)
                 int nivel = (fila == 0) ? 2 : 1; // Nivel del enemigo
                 
-                // Crear enemigo y agregarlo a la lista
-                Ball2 enemigo = new Ball2(enemyX, enemyY, 20, 
-                        velXAsteroides, 
-                        velYAsteroides, 
-                        new Texture(Gdx.files.internal("ene1.png")));
-
-                enemigosLista.add(enemigo);
+                if (tipo != 1) {
+                	// Crear enemigo y agregarlo a la lista
+                    Enemigo enemigo = new Enemigo(enemyX, enemyY, 20, 
+                            velXAsteroides, 
+                            velYAsteroides, 
+                            new Texture(Gdx.files.internal("ene1.png")),this, 
+                            			MathUtils.random(0.1f, 0.5f), nivel);
+                    enemigosLista.add(enemigo);
+                } else {
+                	// Crear enemigo y agregarlo a la lista
+                    Enemigo enemigo = new Enemigo(enemyX, enemyY, 20, 
+                            velXAsteroides, 
+                            velYAsteroides, 
+                            new Texture(Gdx.files.internal("ene2.png")),this, 
+                            			MathUtils.random(0.1f, 0.6f), nivel);
+                    enemigosLista.add(enemigo);
+                }
+                
+                
                 
                 // Incrementar posición X para el siguiente enemigo en la fila
                 enemyX += espacioHorizontal;
@@ -151,42 +165,55 @@ public class PantallaJuego implements Screen {
         dibujaEncabezado();
 
         if (!nave.estaHerido()) {
-            // Colisiones entre balas y enemigos
-            for (int i = 0; i < balas.size(); i++) {
-                Bullet b = balas.get(i);
-                b.update();
+            // Colisiones entre balasJugador y enemigos
+            for (int i = 0; i < balasJugador.size(); i++) {
+                Bullet balaJugador = balasJugador.get(i);
+                balaJugador.update();
+                
                 for (int j = 0; j < enemigosLista.size(); j++) {
-                    Ball2 enemigo = enemigosLista.get(j);
-                    if (b.checkCollision(enemigo)) {
-                        explosionSound.play();
-                        enemigosLista.remove(j);
-                        j--;
-                        score += 10;
+                    Enemigo enemigo = enemigosLista.get(j);
+                    
+                    if (enemigo.checkCollision(balaJugador)) {
+                    	explosionSound.play();
+                    	if (enemigo.estaDestruido()) {
+                    		explosionSound.play();
+                            enemigosLista.remove(j);
+                            j--;
+                            score += 10;
+                    	}
                     }
                 }
-                if (b.isDestroyed()) {
-                    balas.remove(i);
+                if (balaJugador.isDestroyed()) {
+                    balasJugador.remove(i);
                     i--;
                 }
             }
 
-            // Actualizar movimiento de enemigos
-            for (Ball2 enemigo : enemigosLista) {
-                enemigo.mover();
+            
+        }
+        
+     // Actualizar enemigos
+        for (Enemigo enemigo : enemigosLista) {
+            enemigo.mover();
+            if (enemigo.puedeDisparar(delta)) {
+                enemigo.disparar();
             }
+            
 
-            // Verificar colisiones entre enemigos
-            for (int i = 0; i < enemigosLista.size(); i++) {
-                Ball2 enemigo1 = enemigosLista.get(i);
-                for (int j = i + 1; j < enemigosLista.size(); j++) {
-                    Ball2 enemigo2 = enemigosLista.get(j);
-                    enemigo1.checkCollision(enemigo2);
+            for (int i = 0; i < balasEnemigo.size(); i++) {
+                Bullet balaEnemigo = balasEnemigo.get(i);
+                balaEnemigo.update();
+                nave.checkCollision(balaEnemigo);
+                if (balaEnemigo.isDestroyed()) {
+                	balasEnemigo.remove(i);
+                    i--;
                 }
+                balaEnemigo.draw(batch);
             }
         }
 
-        // Dibujar balas
-        for (Bullet b : balas) {
+        // Dibujar balasJugador
+        for (Bullet b : balasJugador) {
             b.draw(batch);
         }
 
@@ -195,12 +222,16 @@ public class PantallaJuego implements Screen {
 
         // Dibujar enemigos y verificar colisión con la nave
         for (int i = 0; i < enemigosLista.size(); i++) {
-            Ball2 enemigo = enemigosLista.get(i);
-            enemigo.draw(batch);
-            if (nave.checkCollision(enemigo)) {
+        	Enemigo enemigo = enemigosLista.get(i);
+        	if (nave.checkCollision(enemigo) || enemigo.estaDestruido()) {
                 enemigosLista.remove(i);
                 i--;
+            } else {
+            	enemigo.draw(batch);
             }
+            
+           
+            
         }
 
         // Verificar si la nave fue destruida
@@ -221,8 +252,11 @@ public class PantallaJuego implements Screen {
 
     
     
-    public boolean agregarBala(Bullet bb) {
-        return balas.add(bb);
+    public boolean agregarBalaJugador(Bullet bb) {
+        return balasJugador.add(bb);
+    }
+    public boolean agregarBalaEnemigo(Bullet bb) {
+        return balasEnemigo.add(bb);
     }
 
     @Override

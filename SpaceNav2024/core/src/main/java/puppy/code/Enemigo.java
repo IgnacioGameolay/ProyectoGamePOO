@@ -6,16 +6,29 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Ball2 extends Entidad {
+
+public class Enemigo extends Entidad {
     private Sprite spr;
+    private float lastShotTime;  // Tiempo del último disparo
+    private float speedAttack;  // Intervalo de disparo en milisegundos
+    private PantallaJuego juego;
     private boolean movingRight = true; // Indica la dirección de movimiento horizontal
     private boolean movingDown = false; // Indica si debe bajar después de chocar
     private float downMovementDistance = 10; // Distancia a bajar tras chocar
+    private Texture txBala;
+    private boolean herido = false;
+    private boolean muerto = false;
 
-    public Ball2(int x, int y, int size, int xSpeed, int ySpeed, Texture texture) {
+    public Enemigo(int x, int y, int size, int xSpeed, int ySpeed, 
+    		Texture texture, PantallaJuego juego, float speedAttack, int vida) {
+    	
         super(x, y, size, xSpeed, ySpeed, texture, xSpeed, ySpeed);
+        this.vida = vida;
         this.spr = new Sprite(texture);
-        
+        this.txBala = new Texture(Gdx.files.internal("bullet_enemigo.png"));
+        this.juego = juego;
+        this.lastShotTime = 1;
+        this.speedAttack = speedAttack; 
         // Asegurar que Ball2 no salga fuera de los límites de la pantalla
         if (x - size < 0) this.x = size;
         if (x + size > Gdx.graphics.getWidth()) this.x = Gdx.graphics.getWidth() - size;
@@ -27,6 +40,7 @@ public class Ball2 extends Entidad {
 
     @Override
     public void mover() {
+    	        
         // Moverse hacia la derecha o izquierda según la dirección
         if (movingRight) {
             x += velocidadX; // Mover hacia la derecha
@@ -62,25 +76,45 @@ public class Ball2 extends Entidad {
 
     @Override
     public void disparar() {
-        // No implementado para Ball2
+        if (juego != null) {
+            Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0f, -0.5f, txBala);
+            juego.agregarBalaEnemigo(bala);
+ 
+        }
+    }
+    
+    public boolean puedeDisparar(float delta) {
+    	this.lastShotTime += delta;
+        if (this.lastShotTime >= (1/this.speedAttack)) {
+        	this.lastShotTime = 0; // Reinicia el temporizador
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean checkCollision(Bullet b) {
+        if (!this.herido && b.getArea().overlaps(this.spr.getBoundingRectangle())) {
+        	b.setDestroyed(true);
+            this.vida--;
+            if (this.vida <= 0) this.muerto = true;
+            return true;
+        }
+        return false;
     }
 
-    public void checkCollision(Ball2 other) {
-        if (spr.getBoundingRectangle().overlaps(other.spr.getBoundingRectangle())) {
-            /* Invertir las velocidades para simular el rebote
-            this.velocidadX *= -1;
-            this.velocidadY *= -1;
-            other.velocidadX *= -1;
-            other.velocidadY *= -1;*/
-        	this.velocidadX *= 1;
-        }
+    public boolean estaDestruido() {
+        return this.muerto;
     }
 
     public Rectangle getArea() {
-        return spr.getBoundingRectangle();
+        return this.spr.getBoundingRectangle();
+    }
+    
+    public Texture getTxBullet() {
+    	return this.txBala;
     }
 
     public void draw(SpriteBatch batch) {
-        spr.draw(batch);
+        this.spr.draw(batch);
     }
 }
