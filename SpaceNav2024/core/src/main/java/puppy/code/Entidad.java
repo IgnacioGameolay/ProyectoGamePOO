@@ -22,7 +22,9 @@ public abstract class Entidad implements Vivible {
 	public abstract void disparar();
 
 	@Override
-    public abstract void vivir();
+    public void vivir() {
+        System.out.println("La entidad está viva.");
+    }
 	
 	public void morir() {
         System.out.println("La entidad ha muerto.");

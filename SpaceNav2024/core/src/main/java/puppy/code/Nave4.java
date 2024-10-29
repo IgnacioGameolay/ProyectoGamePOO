@@ -27,7 +27,7 @@ public class Nave4 extends Entidad {
         this.txBala = txBala;
         this.spr = new Sprite(tx);
         this.spr.setPosition(x, y);
-        this.spr.setBounds(x, y, 45, 45);
+        this.spr.setBounds(x, y, 150, 150);
         this.vida = 3;  // Inicializa vida desde la clase Entidad
     }
 
