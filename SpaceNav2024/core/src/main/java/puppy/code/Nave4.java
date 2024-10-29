@@ -20,8 +20,9 @@ public class Nave4 extends Entidad {
     private int tiempoHeridoMax = 10;
     private int tiempoHerido;
 
-    public Nave4(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala, PantallaJuego juego) {
-        super(x, y, 45, 0, 0, tx, 0, 0);  // Inicializa posición y tamaño en la clase Entidad
+    public Nave4(int x, int y, Texture tx, Sound soundChoque, 
+    		Texture txBala, Sound soundBala, PantallaJuego juego, int vida) {
+        super(x, y, 45, 0, 0, tx, 0, 0, vida);  // Inicializa posición y tamaño en la clase Entidad
         this.juego = juego;
         this.sonidoHerido = soundChoque;
         this.soundBala = soundBala;
@@ -29,7 +30,6 @@ public class Nave4 extends Entidad {
         this.spr = new Sprite(tx);
         this.spr.setPosition(x, y);
         this.spr.setBounds(x, y, 150, 150);
-        this.vida = 3;  // Inicializa vida desde la clase Entidad
     }
 
     public void draw(SpriteBatch batch) {

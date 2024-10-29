@@ -27,27 +27,19 @@ public class PantallaJuego implements Screen {
     private Music gameMusic;
     private Texture bgTexture;
     private Texture heartTexture;
-    private int score;
+    private int currentScore = 0;
     private int ronda;
-    private int velXAsteroides;
-    private int velYAsteroides;
-    private int cantAsteroides;
-    private Random random;
+    private int velXEnemigos;
+    private int velYEnemigos;
     private Nave4 nave;
   
     private List<Enemigo> enemigosLista = new ArrayList<>();
     private List<Bullet> balasJugador = new ArrayList<>();
     private List<Bullet> balasEnemigo = new ArrayList<>();
 
-    public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score, 
-    		int velXAsteroides, int velYAsteroides, int cantAsteroides, int alto, int ancho) {
+    public PantallaJuego(SpaceNavigation game, int alto, int ancho) {
         this.game = game;
-        this.ronda = ronda;
-        this.score = score;
-        this.velXAsteroides = velXAsteroides;
-        this.velYAsteroides = velYAsteroides;
-        this.cantAsteroides = cantAsteroides;
-        this.random = new Random(); // Inicializa Random aquí
+        this.ronda = GameManager.getInstance().getLevel();
         
         batch = game.getBatch();
         camera = new OrthographicCamera();
@@ -69,8 +61,8 @@ public class PantallaJuego implements Screen {
                 Gdx.audio.newSound(Gdx.files.internal("naveHurt.mp3")),
                 new Texture(Gdx.files.internal("bullet.png")),
                 Gdx.audio.newSound(Gdx.files.internal("shoot_theme.mp3")),
-                this); // Pasa PantallaJuego
-        nave.setVidas(vidas);
+                this, 3); // Pasa PantallaJuego
+  
 
         dibujarEnemigos();
 
@@ -105,16 +97,16 @@ public class PantallaJuego implements Screen {
                 if (tipo != 1) {
                 	// Crear enemigo y agregarlo a la lista
                     Enemigo enemigo = new Enemigo(enemyX, enemyY, 20, 
-                            velXAsteroides, 
-                            velYAsteroides, 
+                            velXEnemigos, 
+                            velYEnemigos, 
                             new Texture(Gdx.files.internal("ene1.png")),this, 
                             			MathUtils.random(0.1f, 0.5f), nivel);
                     enemigosLista.add(enemigo);
                 } else {
                 	// Crear enemigo y agregarlo a la lista
                     Enemigo enemigo = new Enemigo(enemyX, enemyY, 20, 
-                            velXAsteroides, 
-                            velYAsteroides, 
+                            velXEnemigos, 
+                            velYEnemigos, 
                             new Texture(Gdx.files.internal("ene2.png")),this, 
                             			MathUtils.random(0.1f, 0.6f), nivel);
                     enemigosLista.add(enemigo);
@@ -147,8 +139,8 @@ public class PantallaJuego implements Screen {
         game.getFont().getData().setScale(2f);
         game.getFont().draw(batch, str, 10, 30);
         batch.setColor(1, 0, 0, 1); // RGB para el bg
-        game.getFont().draw(batch, "Score:" + score, Gdx.graphics.getWidth() - 150, 30);
-        game.getFont().draw(batch, "HighScore:" + game.getHighScore(), Gdx.graphics.getWidth() / 2 - 80, 30);
+        game.getFont().draw(batch, "Score:" + GameManager.getInstance().getScore(), Gdx.graphics.getWidth() - 150, 30);
+        game.getFont().draw(batch, "HighScore:" + GameManager.getInstance().getHighScore(), Gdx.graphics.getWidth() / 2 - 80, 30);
     }
     
    
@@ -179,7 +171,8 @@ public class PantallaJuego implements Screen {
                     		explosionSound.play();
                             enemigosLista.remove(j);
                             j--;
-                            score += 10;
+                            currentScore += 10;
+                            GameManager.getInstance().updateScore(currentScore);
                     	}
                     }
                 }
@@ -236,8 +229,9 @@ public class PantallaJuego implements Screen {
 
         // Verificar si la nave fue destruida
         if (nave.estaDestruido()) {
-            if (score > game.getHighScore()) game.setHighScore(score);
+            if (GameManager.getInstance().getScore() > GameManager.getInstance().getHighScore()) GameManager.getInstance().setHighScore(currentScore);
             game.setScreen(new PantallaGameOver(game));
+            GameManager.getInstance().setScore(0);
             dispose();
         }
 
@@ -245,7 +239,7 @@ public class PantallaJuego implements Screen {
 
         // Verificar si el nivel está completo
         if (enemigosLista.isEmpty()) {
-            game.setScreen(new PantallaJuego(game, ronda + 1, nave.getVidas(), score, velXAsteroides + 3, velYAsteroides + 3, cantAsteroides + 10,1280,720));
+            game.setScreen(new PantallaJuego(game, 1280,720));
             dispose();
         }
     }

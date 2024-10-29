@@ -11,11 +11,12 @@ public abstract class Entidad implements Vivible {
 
     // Constructor
     public Entidad(int x, int y, int size, int xSpeed, int ySpeed, 
-    		Texture texture, float velocidadX, float velocidadY) {
+    		Texture texture, float velocidadX, float velocidadY, int vida) {
         this.x = x;
         this.y = y;
         this.velocidadX = velocidadX;
         this.velocidadY = velocidadY;
+        this.vida = vida;
     }
     
     public abstract void mover(); 

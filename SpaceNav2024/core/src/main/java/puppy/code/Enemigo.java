@@ -22,14 +22,14 @@ public class Enemigo extends Entidad {
     public Enemigo(int x, int y, int size, int xSpeed, int ySpeed, 
     		Texture texture, PantallaJuego juego, float speedAttack, int vida) {
     	
-        super(x, y, size, xSpeed, ySpeed, texture, xSpeed, ySpeed);
-        this.vida = vida;
+        super(x, y, size, xSpeed, ySpeed, texture, xSpeed, ySpeed, vida);
         this.spr = new Sprite(texture);
         this.txBala = new Texture(Gdx.files.internal("bullet_enemigo.png"));
         this.juego = juego;
         this.lastShotTime = 1;
         this.speedAttack = speedAttack; 
-        // Asegurar que Ball2 no salga fuera de los límites de la pantalla
+        
+        // Asegurar que Enemy no salga fuera de los límites de la pantalla
         if (x - size < 0) this.x = size;
         if (x + size > Gdx.graphics.getWidth()) this.x = Gdx.graphics.getWidth() - size;
         if (y - size < 0) this.y = size;
