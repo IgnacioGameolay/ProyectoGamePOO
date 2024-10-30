@@ -2,7 +2,7 @@ package puppy.code;
 
 import com.badlogic.gdx.graphics.Texture;
 
-public abstract class Entidad implements Vivible {
+public abstract class Entidad{
 	protected int x;  // Posición en el eje X
     protected int y;  // Posición en el eje Y
     protected float velocidadX;  // Velocidad de la entidad
@@ -20,18 +20,7 @@ public abstract class Entidad implements Vivible {
     }
     
     public abstract void mover(); 
-	@Override
 	public abstract void disparar();
-
-	@Override
-    public void vivir() {
-        System.out.println("La entidad está viva.");
-    }
-	
-	public void morir() {
-        System.out.println("La entidad ha muerto.");
-    }
-
     
  // Otros métodos comunes
     public boolean isAlive() {

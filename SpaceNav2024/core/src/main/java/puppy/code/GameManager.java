@@ -6,7 +6,7 @@ public class GameManager {
     private int score;
     private int highScore;
     private int level;
-    
+    private PantallaJuego juego;
     // Constructor privado para evitar instanciación externa
     private GameManager() {
     	score = 0;
@@ -53,6 +53,14 @@ public class GameManager {
     
     public void setLevel(int l) {
     	level = l;
+    }
+    
+    public PantallaJuego getJuego() {
+    	return juego;
+    }
+    
+    public void setJuego(PantallaJuego j) {
+    	juego = j;
     }
 }
 

@@ -15,6 +15,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
+import puppy.code.enemigos.EnemigoAbeja;
+import puppy.code.enemigos.EnemigoPolilla;
+import puppy.code.fabricasAbstractas.FabricaAbstractaEnemigo;
+import puppy.code.fabricasAbstractas.FabricaAbstractaJugador;
+import puppy.code.fabricasConcretas.FabricaEnemigoAbeja;
+import puppy.code.fabricasConcretas.FabricaEnemigoPolilla;
+import puppy.code.fabricasConcretas.FabricaEnemigosPorRonda;
+import puppy.code.fabricasConcretas.FabricaJugador;
 
 
 public class PantallaJuego implements Screen {
@@ -29,16 +37,15 @@ public class PantallaJuego implements Screen {
     private Texture heartTexture;
     private int currentScore = 0;
     private int ronda;
-    private int velXEnemigos;
-    private int velYEnemigos;
     private Nave4 nave;
   
     private List<Enemigo> enemigosLista = new ArrayList<>();
     private List<Bullet> balasJugador = new ArrayList<>();
     private List<Bullet> balasEnemigo = new ArrayList<>();
-
+    
     
     public PantallaJuego(SpaceNavigation game, int alto, int ancho) {
+    	GameManager.getInstance().setJuego(this);
         this.game = game;
         this.ronda = GameManager.getInstance().getLevel();
         
@@ -50,23 +57,20 @@ public class PantallaJuego implements Screen {
         
         // Inicializar música y sonidos
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("enemy_1_dead.mp3"));
-        explosionSound.setVolume(1, 0.5f);
+        explosionSound.setVolume(1, 0.25f);
         gameMusic = Gdx.audio.newMusic(Gdx.files.internal("music_theme.mp3"));
         gameMusic.setLooping(true);
-        gameMusic.setVolume(0.5f);
+        gameMusic.setVolume(0.25f);
         gameMusic.play();
 
         // Cargar nave
-        nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30, 
-                new Texture(Gdx.files.internal("spaceship1.png")),
-                Gdx.audio.newSound(Gdx.files.internal("naveHurt.mp3")),
-                new Texture(Gdx.files.internal("bullet.png")),
-                Gdx.audio.newSound(Gdx.files.internal("shoot_theme.mp3")),
-                this, 3); // Pasa PantallaJuego
+        FabricaAbstractaJugador fabricaJugador = new FabricaJugador();
+        
+        nave = fabricaJugador.crearNave(GameManager.getInstance().getJuego());
   
 
         dibujarEnemigos();
-
+        
         
     }
     
@@ -74,11 +78,9 @@ public class PantallaJuego implements Screen {
     
     public void dibujarEnemigos() {
     	//Fabricar enemigo simple
+    	FabricaAbstractaEnemigo fabricaAbstracta = new FabricaEnemigosPorRonda();
+    	//FabricaAbstractaEnemigo enemyPolillaFabric = new FabricaEnemigoPolilla();
     	
-    	FabricaEnemigo enemySimpleFactory = new FabricaEnemigoSimple();
-    	EnemigoSimple enemySimple = (EnemigoSimple) enemySimpleFactory.crearEnemigo();
-    			
-    	enemySimple.helloEnemy();
     	
         enemigosLista.clear(); // Limpiar lista antes de generar nuevos enemigos
 
@@ -103,24 +105,13 @@ public class PantallaJuego implements Screen {
                 int nivel = (fila == 0) ? 2 : 1; // Nivel del enemigo
                 
                 if (tipo != 1) {
-                	// Crear enemigo y agregarlo a la lista
-                    Enemigo enemigo = new Enemigo(enemyX, enemyY, 20, 
-                            velXEnemigos, 
-                            velYEnemigos, 
-                            new Texture(Gdx.files.internal("ene1.png")),this, 
-                            			MathUtils.random(0.1f, 0.5f), nivel);
-                    enemigosLista.add(enemigo);
+                    enemigosLista.add(fabricaAbstracta.crearAbeja(enemyX, enemyY, GameManager.getInstance().getJuego()));
                 } else {
                 	// Crear enemigo y agregarlo a la lista
-                    Enemigo enemigo = new Enemigo(enemyX, enemyY, 20, 
-                            velXEnemigos, 
-                            velYEnemigos, 
-                            new Texture(Gdx.files.internal("ene2.png")),this, 
-                            			MathUtils.random(0.1f, 0.6f), nivel);
-                    enemigosLista.add(enemigo);
+                	//EnemigoEspecial enemySpecial = (EnemigoEspecial) enemySimpleFactory.crearEnemigoEspecial(enemyX, enemyY, this);
+                	//Enemigo enemyPolilla = (EnemigoPolilla) enemyPolillaFabric.crearEnemigo(enemyX, enemyY, GameManager.getInstance().getJuego());
+                	enemigosLista.add(fabricaAbstracta.crearPolilla(enemyX, enemyY, GameManager.getInstance().getJuego()));
                 }
-                
-                
                 
                 // Incrementar posición X para el siguiente enemigo en la fila
                 enemyX += espacioHorizontal;
@@ -197,6 +188,7 @@ public class PantallaJuego implements Screen {
         for (Enemigo enemigo : enemigosLista) {
             enemigo.mover();
             if (enemigo.puedeDisparar(delta)) {
+            	//System.out.println("estoy shoorint?");
                 enemigo.disparar();
             }
             
@@ -248,7 +240,7 @@ public class PantallaJuego implements Screen {
         // Verificar si el nivel está completo
         if (enemigosLista.isEmpty()) {
             game.setScreen(new PantallaJuego(game, 1280,720));
-            dispose();
+            //dispose();
         }
     }
 
