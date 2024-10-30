@@ -19,6 +19,7 @@ public class Enemigo extends Entidad {
     private boolean herido = false;
     private boolean muerto = false;
 
+    
     public Enemigo(int x, int y, int size, int xSpeed, int ySpeed, 
     		Texture texture, PantallaJuego juego, float speedAttack, int vida) {
     	

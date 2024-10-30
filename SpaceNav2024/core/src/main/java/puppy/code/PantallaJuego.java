@@ -37,6 +37,7 @@ public class PantallaJuego implements Screen {
     private List<Bullet> balasJugador = new ArrayList<>();
     private List<Bullet> balasEnemigo = new ArrayList<>();
 
+    
     public PantallaJuego(SpaceNavigation game, int alto, int ancho) {
         this.game = game;
         this.ronda = GameManager.getInstance().getLevel();
@@ -72,6 +73,13 @@ public class PantallaJuego implements Screen {
 
     
     public void dibujarEnemigos() {
+    	//Fabricar enemigo simple
+    	
+    	FabricaEnemigo enemySimpleFactory = new FabricaEnemigoSimple();
+    	EnemigoSimple enemySimple = (EnemigoSimple) enemySimpleFactory.crearEnemigo();
+    			
+    	enemySimple.helloEnemy();
+    	
         enemigosLista.clear(); // Limpiar lista antes de generar nuevos enemigos
 
         // Configuración de filas
@@ -121,7 +129,7 @@ public class PantallaJuego implements Screen {
     }
     
     
-    public void dibujaEncabezado() {
+    public void dibujarHUD() {
         CharSequence str = "Vidas: ";
         int vidas = nave.getVidas();
         for (int i = 0; i < 3; i++) {
@@ -154,7 +162,7 @@ public class PantallaJuego implements Screen {
         batch.begin();
         batch.draw(bgTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         
-        dibujaEncabezado();
+        dibujarHUD();
 
         if (!nave.estaHerido()) {
             // Colisiones entre balasJugador y enemigos
