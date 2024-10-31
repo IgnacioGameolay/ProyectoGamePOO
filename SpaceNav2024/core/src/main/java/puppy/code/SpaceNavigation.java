@@ -15,15 +15,13 @@ public class SpaceNavigation extends Game {
 	private String nombreJuego = "Te Echaste el Ramo";
 	private SpriteBatch batch;
 	private BitmapFont font;
-	private Texture background;
 
 			
 	public void create() {
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 		font.getData().setScale(2f);
-		background = new Texture(Gdx.files.internal("template.png"));
-
+		
         
 		Screen ss = new PantallaMenu(this);
 		this.setScreen(ss);
@@ -31,16 +29,11 @@ public class SpaceNavigation extends Game {
 
 	public void render() {
 		super.render(); // important!
-		
-		batch.begin();
-        batch.draw(background, 0, 0, 600, 900); // Ajusta el tamaño y posición según sea necesario
-        batch.end();
 	}
 
 	public void dispose() {
 		batch.dispose();
 		font.dispose();
-		background.dispose();
 	}
 
 	public SpriteBatch getBatch() {
