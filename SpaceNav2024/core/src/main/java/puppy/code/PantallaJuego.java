@@ -15,29 +15,23 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
-import puppy.code.enemigos.EnemigoAbeja;
-import puppy.code.enemigos.EnemigoPolilla;
+import puppy.code.enemigos.*;
 import puppy.code.fabricasAbstractas.FabricaAbstractaEnemigo;
 import puppy.code.fabricasAbstractas.FabricaAbstractaJugador;
-import puppy.code.fabricasConcretas.FabricaEnemigoAbeja;
-import puppy.code.fabricasConcretas.FabricaEnemigoPolilla;
 import puppy.code.fabricasConcretas.FabricaEnemigosPorRonda;
-import puppy.code.fabricasConcretas.FabricaJugador;
+import puppy.code.fabricasConcretas.FabricaJugadorBase;
 
 
 public class PantallaJuego implements Screen {
     private SpaceNavigation game;
     private OrthographicCamera camera;
-    private int alto;
-    private int ancho;
     private SpriteBatch batch;
     private Sound explosionSound;
     private Music gameMusic;
     private Texture bgTexture;
     private Texture heartTexture;
     private int currentScore = 0;
-    private int ronda;
-    private Nave4 nave;
+    private Nave nave;
   
     private List<Enemigo> enemigosLista = new ArrayList<>();
     private List<Bullet> balasJugador = new ArrayList<>();
@@ -46,9 +40,7 @@ public class PantallaJuego implements Screen {
     
     public PantallaJuego(SpaceNavigation game, int alto, int ancho) {
     	GameManager.getInstance().setJuego(this);
-        this.game = game;
-        this.ronda = GameManager.getInstance().getLevel();
-        
+        this.game = game; 
         batch = game.getBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, alto, ancho);
@@ -62,67 +54,27 @@ public class PantallaJuego implements Screen {
         gameMusic.setLooping(true);
         gameMusic.setVolume(0.25f);
         gameMusic.play();
-
+        
         // Cargar nave
-        FabricaAbstractaJugador fabricaJugador = new FabricaJugador();
+        FabricaAbstractaJugador fabricaJugador = new FabricaJugadorBase();
         
         nave = fabricaJugador.crearNave(GameManager.getInstance().getJuego());
-  
+        nave.setVida(10);
 
-        dibujarEnemigos();
-        
-        
+        crearRonda();
+      
     }
     
 
     
-    public void dibujarEnemigos() {
-    	//Fabricar enemigo simple
-    	FabricaAbstractaEnemigo fabricaAbstracta = new FabricaEnemigosPorRonda();
-    	//FabricaAbstractaEnemigo enemyPolillaFabric = new FabricaEnemigoPolilla();
-    	
-    	
-        enemigosLista.clear(); // Limpiar lista antes de generar nuevos enemigos
-
-        // Configuración de filas
-        int filas = 3;               // Número de filas de enemigos
-        int enemigosPorFila = 4;     // Número de enemigos en cada fila
-        int espacioHorizontal = 200; // Espacio entre enemigos en la misma fila
-        int espacioVertical = 100;   // Espacio entre filas
-
-        // Coordenadas iniciales
-        int yInicial = 400;          // Altura inicial de la primera fila
-        int xInicial = ancho;          // Posición inicial en X
-
-        // Generación de filas de enemigos
-        for (int fila = 0; fila < filas; fila++) {
-            int enemyX = xInicial;
-            int enemyY = yInicial + (fila * espacioVertical); // Incremento en Y por cada fila
-            
-            for (int i = 0; i < enemigosPorFila; i++) {
-                // Elegir tipo de enemigo según la fila
-                int tipo = (fila == 0) ? 1 : 0; // Tipo de enemigo (1 para fila 0, 0 para las demás)
-                int nivel = (fila == 0) ? 2 : 1; // Nivel del enemigo
-                
-                if (tipo != 1) {
-                    enemigosLista.add(fabricaAbstracta.crearAbeja(enemyX, enemyY, GameManager.getInstance().getJuego()));
-                } else {
-                	// Crear enemigo y agregarlo a la lista
-                	//EnemigoEspecial enemySpecial = (EnemigoEspecial) enemySimpleFactory.crearEnemigoEspecial(enemyX, enemyY, this);
-                	//Enemigo enemyPolilla = (EnemigoPolilla) enemyPolillaFabric.crearEnemigo(enemyX, enemyY, GameManager.getInstance().getJuego());
-                	enemigosLista.add(fabricaAbstracta.crearPolilla(enemyX, enemyY, GameManager.getInstance().getJuego()));
-                }
-                
-                // Incrementar posición X para el siguiente enemigo en la fila
-                enemyX += espacioHorizontal;
-            }
-        }
+    public void crearRonda() {
+    	GameManager.getInstance().crearRonda(enemigosLista);
     }
     
     
     public void dibujarHUD() {
         CharSequence str = "Vidas: ";
-        int vidas = nave.getVidas();
+        int vidas = nave.getVida();
         for (int i = 0; i < 3; i++) {
             if (i < vidas) {
                 // Dibuja un corazón lleno si la nave tiene vida
@@ -130,14 +82,13 @@ public class PantallaJuego implements Screen {
             }
         }
      // Dibuja la ronda
-        CharSequence rondaStr = "Ronda: " + ronda;
+        CharSequence rondaStr = "Ronda: " + GameManager.getInstance().getRonda();
         game.getFont().getData().setScale(2f);
         game.getFont().draw(batch, rondaStr, 300, 30); 
         
         
         game.getFont().getData().setScale(2f);
         game.getFont().draw(batch, str, 10, 30);
-        batch.setColor(1, 0, 0, 1); // RGB para el bg
         game.getFont().draw(batch, "Score:" + GameManager.getInstance().getScore(), Gdx.graphics.getWidth() - 150, 30);
         game.getFont().draw(batch, "HighScore:" + GameManager.getInstance().getHighScore(), Gdx.graphics.getWidth() / 2 - 80, 30);
     }
@@ -151,9 +102,15 @@ public class PantallaJuego implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
         batch.begin();
+        
+        // Cambiar el color solo para el fondo
+        batch.setColor(1, 0, 0, 1); // Cambiar a rojo
         batch.draw(bgTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         
-        dibujarHUD();
+        // Restablecer el color a blanco
+        batch.setColor(1, 1, 1, 1); // Restablecer el color a blanco
+        
+        
 
         if (!nave.estaHerido()) {
             // Colisiones entre balasJugador y enemigos
@@ -226,21 +183,21 @@ public class PantallaJuego implements Screen {
            
             
         }
-
+        
         // Verificar si la nave fue destruida
         if (nave.estaDestruido()) {
-            if (GameManager.getInstance().getScore() > GameManager.getInstance().getHighScore()) GameManager.getInstance().setHighScore(currentScore);
-            game.setScreen(new PantallaGameOver(game));
-            GameManager.getInstance().setScore(0);
+            
             dispose();
         }
-
+        
+        dibujarHUD();
         batch.end();
 
         // Verificar si el nivel está completo
         if (enemigosLista.isEmpty()) {
-            game.setScreen(new PantallaJuego(game, 1280,720));
-            //dispose();
+            
+            GameManager.getInstance().updateRonda();
+            crearRonda();
         }
     }
 
@@ -251,6 +208,10 @@ public class PantallaJuego implements Screen {
     }
     public boolean agregarBalaEnemigo(Bullet bb) {
         return balasEnemigo.add(bb);
+    }
+    
+    public SpriteBatch getBatch() {
+    	return batch;
     }
 
     @Override
@@ -272,9 +233,14 @@ public class PantallaJuego implements Screen {
 
     @Override
     public void dispose() {
+    	
         explosionSound.dispose();
         gameMusic.dispose();
         bgTexture.dispose();
+        if (GameManager.getInstance().getScore() > GameManager.getInstance().getHighScore()) GameManager.getInstance().setHighScore(GameManager.getInstance().getScore());
+        GameManager.getInstance().setRonda(1);
+        GameManager.getInstance().setScore(0);
+        game.setScreen(new PantallaGameOver(game));
     }
    
 }

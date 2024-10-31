@@ -11,7 +11,8 @@ import puppy.code.PantallaJuego;
 public class EnemigoMiniBoss extends Enemigo {
 
     public EnemigoMiniBoss(int x, int y, PantallaJuego juego) {
-        super(x, y, 30, 2, 2, new Texture(Gdx.files.internal("ene3.png")), juego,  MathUtils.random(0.1f, 1f), 5);
+        super(x, y, 30, 4, 4, new Texture(Gdx.files.internal("ene3.png")), juego,  MathUtils.random(0.5f, 1f), 10);
+        this.aumentarTamano(1.5f);
     }
 
     @Override

@@ -11,7 +11,8 @@ import puppy.code.PantallaJuego;
 public class EnemigoFinalBoss extends Enemigo {
 
     public EnemigoFinalBoss(int x, int y, PantallaJuego juego) {
-        super(x, y, 40, 2, 2, new Texture(Gdx.files.internal("ene4.png")), juego,  MathUtils.random(0.1f, 1f), 6);
+        super(x, y, 30, 1, 5, new Texture(Gdx.files.internal("ene4.png")), juego,  MathUtils.random(0.8f, 1f), 20);
+        this.aumentarTamano(2.0f);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class EnemigoFinalBoss extends Enemigo {
     @Override
     public void disparar() {
         if (juego != null) {
-            Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0f, -0.5f, txBala);
+            Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0f, -1f, txBala);
             juego.agregarBalaEnemigo(bala);
         }
     }

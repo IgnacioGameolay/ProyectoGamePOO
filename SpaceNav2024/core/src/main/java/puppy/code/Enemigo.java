@@ -35,6 +35,19 @@ public abstract class Enemigo extends Entidad {
 
         spr.setPosition(this.x, this.y);
     }
+    
+    // Método para aumentar el tamaño del sprite y la hitbox
+    public void aumentarTamano(float factor) {
+        // Obtener el tamaño actual
+        float nuevoAncho = spr.getWidth() * factor;
+        float nuevoAlto = spr.getHeight() * factor;
+        
+        // Ajustar el tamaño del sprite
+        spr.setSize(nuevoAncho, nuevoAlto);
+        
+        // Actualizar la posición de la hitbox
+        spr.setPosition(this.x, this.y);
+    }
 
     // Deja mover() como un método abstracto para que cada tipo de enemigo
     // implemente su propio comportamiento de movimiento
@@ -52,7 +65,6 @@ public abstract class Enemigo extends Entidad {
         if (this.lastShotTime >= (1 / this.speedAttack)) {
         	
             this.lastShotTime = 0; // Reinicia el temporizador
-            System.out.println("deverria choter?" + lastShotTime);
             return true;
         }
         return false;

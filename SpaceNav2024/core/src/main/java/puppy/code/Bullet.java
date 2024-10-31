@@ -46,7 +46,7 @@ public class Bullet {
 	        return false;
 	    }
 	    
-	    public boolean checkCollision(Nave4 n) {
+	    public boolean checkCollision(Nave n) {
 	        if(spr.getBoundingRectangle().overlaps(n.getArea())){
 	            this.destroyed = true;
 	            return true;

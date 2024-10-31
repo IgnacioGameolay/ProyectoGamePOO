@@ -1,17 +1,22 @@
 package puppy.code;
 
+import java.util.List;
+import puppy.code.rondas.*;
+
 public class GameManager {
     // La única instancia del GameManager
     private static GameManager instance;
     private int score;
     private int highScore;
-    private int level;
+    private int ronda;
     private PantallaJuego juego;
+    private InterfaceStrategiaRonda rondaStrategy;
+    
     // Constructor privado para evitar instanciación externa
     private GameManager() {
     	score = 0;
     	highScore = 0;
-    	level = 1;
+    	ronda = 1;
     }
 
     // Método para obtener la instancia del Singleton
@@ -22,13 +27,27 @@ public class GameManager {
         return instance;
     }
     
+    public void crearRonda(List<Enemigo> enemigosLista) {
+		enemigosLista.clear(); // Limpiar lista antes de generar nuevos enemigos
+
+    	if (ronda <= 3) {
+    		rondaStrategy = new RondaNormal();
+    	} else if (ronda == 4) {
+    		rondaStrategy = new RondaMiniBoss();
+    	} else {
+    		rondaStrategy = new RondaFinalBoss();
+    	}
+    	
+    	rondaStrategy.configurarRonda(juego, enemigosLista);
+    }
+    
 
     public void updateScore(int points) {
     	score += points;
     }
     
-    public void updateLevel() {
-    	level++;
+    public void updateRonda() {
+    	ronda++;
     }
     
     public int getScore() {
@@ -39,8 +58,8 @@ public class GameManager {
     	return highScore;
     }
     
-    public int getLevel() {
-    	return level;
+    public int getRonda() {
+    	return ronda;
     }
     
     public void setScore(int s) {
@@ -51,8 +70,8 @@ public class GameManager {
     	highScore = hs;
     }
     
-    public void setLevel(int l) {
-    	level = l;
+    public void setRonda(int l) {
+    	ronda = l;
     }
     
     public PantallaJuego getJuego() {
