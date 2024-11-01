@@ -8,14 +8,24 @@ import puppy.code.PantallaJuego;
 import puppy.code.fabricasAbstractas.FabricaAbstractaEnemigo;
 import puppy.code.fabricasConcretas.FabricaEnemigosPorRonda;
 
+/**
+ * Clase que representa la estrategia para configurar la ronda final con un jefe final.
+ * Implementa la interfaz InterfaceStrategiaRonda.
+ */
 public class RondaFinalBoss implements InterfaceStrategiaRonda {
-	
-	@Override
-	public void configurarRonda(PantallaJuego juego, List<Enemigo> enemigosLista){
-		enemigosLista.clear(); // Limpiar lista antes de generar nuevos enemigos
 
-		FabricaAbstractaEnemigo fabricaAbstracta = new FabricaEnemigosPorRonda();
-	
+    /**
+     * Configura la ronda final generando enemigos y agregándolos a la lista.
+     *
+     * @param juego La pantalla del juego donde se mostrará la ronda.
+     * @param enemigosLista La lista donde se agregarán los enemigos generados.
+     */
+    @Override
+    public void configurarRonda(PantallaJuego juego, List<Enemigo> enemigosLista) {
+        enemigosLista.clear(); // Limpiar lista antes de generar nuevos enemigos
+
+        FabricaAbstractaEnemigo fabricaAbstracta = new FabricaEnemigosPorRonda();
+
         // Configuración de filas
         int filas = 3;               // Número de filas de enemigos
         int enemigosPorFila = 4;     // Número de enemigos en cada fila
@@ -27,18 +37,19 @@ public class RondaFinalBoss implements InterfaceStrategiaRonda {
         int yInicial = 400;          // Altura inicial de la primera fila
         int xInicial = 200;          // Posición inicial en X
 
-     // Generación de filas de enemigos
+        // Generación de filas de enemigos
         int enemyX = xInicial;
         int enemyY = yInicial + espacioVertical; // Incremento en Y por cada fila
         
+        // Generar enemigos en las filas
         for (int i = 0; i < enemigosPorFila; i++) {
-   
             enemigosLista.add(fabricaAbstracta.crearMiniBoss(enemyX, enemyY, GameManager.getInstance().getJuego()));
             
             // Incrementar posición X para el siguiente enemigo en la fila
             enemyX += espacioHorizontal;
         }
         
+        // Agregar el jefe final al final de la fila de enemigos
         enemigosLista.add(fabricaAbstracta.crearFinalBoss(enemyX, enemyY, GameManager.getInstance().getJuego()));
-	}
+    }
 }

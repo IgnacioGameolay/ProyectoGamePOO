@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
 public class SpaceNavigation extends Game {
-	private String nombreJuego = "Te Echaste el Ramo";
+	private String nombreJuego = "Salvando el Semestre";
 	private SpriteBatch batch;
 	private BitmapFont font;
 

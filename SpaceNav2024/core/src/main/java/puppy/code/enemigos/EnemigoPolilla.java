@@ -8,38 +8,60 @@ import puppy.code.Bullet;
 import puppy.code.Enemigo;
 import puppy.code.PantallaJuego;
 
+/**
+ * Clase que representa un enemigo de tipo Polilla en el juego.
+ * Extiende la clase base Enemigo y define su comportamiento específico.
+ */
 public class EnemigoPolilla extends Enemigo {
+    
+    /**
+     * Constructor para crear una instancia de EnemigoPolilla.
+     *
+     * @param x La coordenada X inicial del enemigo.
+     * @param y La coordenada Y inicial del enemigo.
+     * @param juego La pantalla del juego donde se encuentra este enemigo.
+     */
     public EnemigoPolilla(int x, int y, PantallaJuego juego) {
-        super(x, y, 20, 2, 2, new Texture(Gdx.files.internal("ene2.png")), juego,  MathUtils.random(0.1f, 0.5f), 3);
+        super(x, y, 20, 2, 2, new Texture(Gdx.files.internal("ene2.png")), juego, MathUtils.random(0.1f, 0.5f), 3);
     }
 
+    /**
+     * Método que define el movimiento del enemigo Polilla.
+     * Se mueve de lado a lado y desciende una vez que alcanza el borde de la pantalla.
+     */
     @Override
     public void mover() {
-        // Implementación de movimiento específica para EnemigoSimple
+        // Implementación de movimiento específica para EnemigoPolilla
         if (movingRight) {
-            x += velocidadX+10;
+            x += velocidadX + 10;  // Mover a la derecha
         } else {
-            x -= velocidadX+10;
+            x -= velocidadX + 10;  // Mover a la izquierda
         }
 
+        // Verificar límites de pantalla y cambiar dirección
         if (x < 0 || x + spr.getWidth() > Gdx.graphics.getWidth()) {
-            movingDown = true;
-            movingRight = !movingRight;
+            movingDown = true;      // Cambiar a movimiento vertical
+            movingRight = !movingRight; // Cambiar dirección horizontal
         }
 
+        // Mover hacia abajo
         if (movingDown) {
-            y -= downMovementDistance;
-            movingDown = false;
+            y -= downMovementDistance; // Desciende
+            movingDown = false;        // Resetea el movimiento hacia abajo
         }
 
-        spr.setPosition(x, y);
+        spr.setPosition(x, y); // Actualizar la posición del sprite
     }
 
+    /**
+     * Método que permite al enemigo Polilla disparar una bala.
+     * Crea una nueva instancia de Bullet y la agrega al juego.
+     */
     @Override
     public void disparar() {
-        if ((this.juego != null)) {
+        if (this.juego != null) {
             Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0f, -0.5f, txBala);
-            juego.agregarBalaEnemigo(bala);
+            juego.agregarBalaEnemigo(bala); // Agrega la bala al juego
         }
     }
 }

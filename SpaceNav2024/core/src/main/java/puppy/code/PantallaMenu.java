@@ -36,7 +36,7 @@ public class PantallaMenu implements Screen {
 		game.getBatch().draw(background, 0, 0, ancho, alto);
 
 
-		game.getFont().draw(game.getBatch(), "¡¡Bienvenido a Te Echaste el Ramo!!", 350, alto/2);
+		game.getFont().draw(game.getBatch(), "¡¡Bienvenido a Salvando el Semestre!!", 350, alto/2);
 		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado o presiona cualquier tecla para comenzar ...", 200, alto/2-100);
 
 		game.getBatch().end();

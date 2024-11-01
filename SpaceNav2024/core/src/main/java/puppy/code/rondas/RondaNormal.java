@@ -8,12 +8,22 @@ import puppy.code.PantallaJuego;
 import puppy.code.fabricasAbstractas.FabricaAbstractaEnemigo;
 import puppy.code.fabricasConcretas.FabricaEnemigosPorRonda;
 
+/**
+ * Clase que representa la estrategia para configurar una ronda normal de enemigos.
+ * Implementa la interfaz InterfaceStrategiaRonda.
+ */
 public class RondaNormal implements InterfaceStrategiaRonda {
-	
-	@Override
-	public void configurarRonda(PantallaJuego juego, List<Enemigo> enemigosLista){
-		FabricaAbstractaEnemigo fabricaAbstracta = new FabricaEnemigosPorRonda();
-	
+
+    /**
+     * Configura la ronda generando enemigos en filas y agregándolos a la lista.
+     *
+     * @param juego La pantalla del juego donde se mostrará la ronda.
+     * @param enemigosLista La lista donde se agregarán los enemigos generados.
+     */
+    @Override
+    public void configurarRonda(PantallaJuego juego, List<Enemigo> enemigosLista) {
+        FabricaAbstractaEnemigo fabricaAbstracta = new FabricaEnemigosPorRonda();
+    
         // Configuración de filas
         int filas = 3;               // Número de filas de enemigos
         int enemigosPorFila = 4;     // Número de enemigos en cada fila
@@ -31,10 +41,10 @@ public class RondaNormal implements InterfaceStrategiaRonda {
             int enemyY = yInicial + (fila * espacioVertical); // Incremento en Y por cada fila
             
             for (int i = 0; i < enemigosPorFila; i++) {
-                // Elegir tipo de enemigo según la fila
-            	int cantAbejas = Math.max(0, 4 - ronda + 1);
-                //int cantPolillas = Math.min(4, ronda-1);
+                // Determinar la cantidad de abejas que se pueden crear según el nivel de la ronda
+                int cantAbejas = Math.max(0, 4 - ronda + 1);
                 
+                // Crear enemigos según la fila
                 if (i < cantAbejas) {
                     // Crear una abeja si todavía hay abejas disponibles
                     enemigosLista.add(fabricaAbstracta.crearAbeja(enemyX, enemyY, juego));
@@ -47,5 +57,5 @@ public class RondaNormal implements InterfaceStrategiaRonda {
                 enemyX += espacioHorizontal;
             }
         }
-	}
+    }
 }
