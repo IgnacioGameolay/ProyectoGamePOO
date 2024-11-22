@@ -159,11 +159,7 @@ public class PantallaJuego implements Screen {
         
         // Actualizar enemigos
         for (Enemigo enemigo : enemigosLista) {
-            enemigo.mover(); // Mueve al enemigo
-            
-            if (enemigo.puedeDisparar(delta)) { // Verifica si el enemigo puede disparar
-                enemigo.disparar(); // El enemigo dispara
-            }
+            enemigo.actualizar(delta);
 
             // Actualizar y dibujar balas de enemigos
             for (int i = 0; i < balasEnemigo.size(); i++) {

@@ -53,6 +53,28 @@ public abstract class Enemigo extends Entidad {
     }
     
     /**
+     * Método Template que define el flujo de actualización del enemigo.
+     */
+    public final void actualizar(float delta) {
+        verificarEstado(); // Paso 1: Verificar el estado del enemigo
+        if (!estaDestruido()) { // Si no está destruido, continúa con las operaciones
+            mover(); // Paso 2: Movimiento específico (implementado por la subclase)
+            if (puedeDisparar(delta)) { 
+                disparar(); // Paso 3: Disparo específico (implementado por la subclase)
+            }
+        }
+    }
+    
+    /**
+     * Verifica el estado del enemigo, como su vida y si está herido.
+     */
+    protected void verificarEstado() {
+        if (this.vida <= 0) {
+            this.muerto = true;
+        }
+    }
+    
+    /**
      * Aumenta el tamaño del sprite y de la hitbox del enemigo.
      * 
      * @param factor Factor por el cual se aumenta el tamaño del sprite
